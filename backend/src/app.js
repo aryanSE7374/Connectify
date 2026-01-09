@@ -8,8 +8,7 @@ import cors from "cors";
 import userRoutes from "./routes/users.routes.js"
 
 const PORT = 3000 ;
-// const connectionString = "mongodb+srv://aryanshrivastav7374:PoojaCluster0@cluster0.k8rfecs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0/ConnectifyDB";
-const connectionString = "mongodb+srv://aryanshrivastav7374:PoojaCluster0@cluster0.k8rfecs.mongodb.net/ConnectifyDB?retryWrites=true&w=majority&appName=Cluster0";
+const connectionString = process.env.MONGO_URI;
 
 const app = express();
 const server = createServer(app);
