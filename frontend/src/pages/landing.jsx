@@ -6,7 +6,7 @@ function landing() {
     <div className='landingPageContainer'>
       <nav>
         <div className='navHeader'>
-          <h2>Connectify</h2>
+          <h2>Connectify - under Testing</h2>
         </div>
         <div className='navlist'>
           <p>Join as Guest</p>
