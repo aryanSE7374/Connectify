@@ -1,13 +1,14 @@
 import express from "express";
 import { createServer } from "node:http";
-import { Server } from "socket.io";
+// import { Server } from "socket.io";
 import mongoose from "mongoose";
 import {connectToSocket} from "./controllers/socketManager.js";
 
 import cors from "cors";
 import userRoutes from "./routes/users.routes.js"
 
-const PORT = 3000 ;
+const PORT = process.env.ENV_PORT ;
+
 const connectionString = process.env.MONGO_URI;
 
 const app = express();
