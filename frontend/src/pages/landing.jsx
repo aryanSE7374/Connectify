@@ -28,7 +28,7 @@ function landing() {
                 </div>
                 <div>
 
-                    <img src="/mobile.png" alt="" />
+                    {/* <img src="/mobile.png" alt="" /> */}
 
                 </div>
             </div>
