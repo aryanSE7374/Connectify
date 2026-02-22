@@ -13,9 +13,10 @@ dotenv.config();
 const PORT = process.env.ENV_PORT ;
 
 const connectionString = process.env.MONGO_URI;
+const connectionStringDev = process.env.LOCAL_DB;
 
 const app = express();
-const server = createServer(app);
+const server = createServer(app); // node:http server
 // const io = new Server(server);
 const io = connectToSocket(server);
 
@@ -42,8 +43,7 @@ const start = async ()=>{
     // app.set("mongo_user");
 
     try{
-        // const connectionDB = await mongoose.connect("mongodb+srv://aryanshrivastav7374:PoojaCluster0@cluster0.k8rfecs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0");
-        const connectionDB = await mongoose.connect("mongodb+srv://aryanshrivastav7374:PoojaCluster0@cluster0.k8rfecs.mongodb.net/ConnectifyDB?retryWrites=true&w=majority&appName=Cluster0");
+        const connectionDB = await mongoose.connect(connectionString);
         console.log(`MongoDB connection to DB host: ${connectionDB.connection.host}`);
     }
     catch(e){

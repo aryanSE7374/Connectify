@@ -1,180 +1,159 @@
-import * as React from "react";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import Link from "@mui/material/Link";
-import Paper from "@mui/material/Paper";
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import Typography from "@mui/material/Typography";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Snackbar } from "@mui/material";
-import {AuthContext} from "../contexts/AuthContext";
-
-// TODO remove, this demo shouldn't need to reset the theme.
+import * as React from 'react';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import TextField from '@mui/material/TextField';
+import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { AuthContext } from '../contexts/AuthContext';
+import { Snackbar } from '@mui/material';
 
 const defaultTheme = createTheme();
 
 export default function Authentication() {
-  const [username, setUsername] = React.useState();
-  const [password, setPassword] = React.useState();
-  const [name, setName] = React.useState();
-  const [error, setError] = React.useState();
-  const [message, setMessage] = React.useState();
 
-  const [formState, setFormState] = React.useState(0); //0->"login" , 1->"register"
-    
-  const [open, setOpen] = React.useState(false);
+    const [username, setUsername] = React.useState();
+    const [password, setPassword] = React.useState();
+    const [name, setName] = React.useState();
+    const [error, setError] = React.useState();
+    const [message, setMessage] = React.useState();
+    const [formState, setFormState] = React.useState(0);
+    const [open, setOpen] = React.useState(false)
 
-  const { handleRegister, handleLogin } = React.useContext(AuthContext);
+    const { handleRegister, handleLogin } = React.useContext(AuthContext);
 
-  let handleAuth = async () => {
-    try {
-      if (formState === 0) {
-        await handleLogin(username, password);
-      } else if (formState === 1) {
-        let result = handleRegister(name, username, password);
-        setUsername("");
-        setMessage(result);
-        setOpen(true);
-        setError("");
-        setFormState(0);
-        setPassword("");
-      }
-    } catch (err) {
-      console.log(err)
-      let message =err.message;
-    if(message==="Request failed with status code 404"){
-      setError("User already exist");
+    let handleAuth = async () => {
+        try {
+            if (formState === 0) {
+                let result = await handleLogin(username, password)
+            }
+            if (formState === 1) {
+                let result = await handleRegister(name, username, password);
+                console.log(result);
+                setUsername("");
+                setMessage(result);
+                setOpen(true);
+                setError("")
+                setFormState(0)
+                setPassword("")
+            }
+        } catch (err) {
+            console.log(err);
+            let message = (err.response.data.message);
+            setError(message);
+        }
     }
-      console.log(error)
-    }
-  };
 
-  return (
-    <ThemeProvider theme={defaultTheme}>
-      <Grid container component="main" sx={{ height: "100vh" }}>
-        <CssBaseline />
-        <Grid
-          item
-          xs={false}
-          sm={4}
-          md={7}
-          sx={{
-            backgroundImage:
-              "url(https://picsum.photos/600/400?random=${Date.now()})",  //add bg
-            backgroundRepeat: "no-repeat",
-            backgroundColor: (t) =>
-              t.palette.mode === "light"
-                ? t.palette.grey[50]
-                : t.palette.grey[900],
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        />
-        <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-          <Box
-            sx={{
-              my: 8,
-              mx: 4,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-              <LockOutlinedIcon />
-            </Avatar>
-
-            <div>
-              <Button
-                variant={formState === 0 ? "contained" : ""}
-                onClick={() => setFormState(0)}
-              >
-                Sign in
-              </Button>
-              <Button
-                variant={formState === 1 ? "contained" : ""}
-                onClick={() => setFormState(1)}
-              >
-                Sign up
-              </Button>
-            </div>
-
-            <Box component="form" noValidate sx={{ mt: 1 }}>
-               {formState === 1 ? (
-              <>
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="FullName"
-                  label="Full name"
-                  name="FullName"
-                  value={name}
-                  
-                  onChange={(e) => setName(e.target.value)}
+    return (
+        <ThemeProvider theme={defaultTheme}>
+            <Grid container component="main" sx={{ height: '100vh' }}>
+                <CssBaseline />
+                <Grid
+                    item
+                    xs={false}
+                    sm={4}
+                    md={7}
+                    sx={{
+                        backgroundImage: 'url(https://images.unsplash.com/photo-1572072393749-3ca9c8ea0831?auto=format&fit=crop&q=80)',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundColor: (t) =>
+                            t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                    }}
                 />
-              </>
-            ):<></>}
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="username"
-                label="User name"
-                name="username"
-                value={username}
-                autoFocus
-                onChange={(e) => setUsername(e.target.value)}
-              />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
 
-              {formState===1?<><p style={{ color: "red" }}>{error}</p></>:<></>}
+                <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
+                    <Box
+                        sx={{
+                            my: 8,
+                            mx: 4,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+                            <LockOutlinedIcon />
+                        </Avatar>
 
-              <Button
-                type="button"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}
-                onClick={handleAuth}
-              >
-                {formState === 0 ? "Login" : "Register"}
-              </Button>
+                        {/* test paragraph */}
+                        {/* <div> 
+                          <p>this is a parah below avatar</p>
+                        </div> */}
 
-              {/* <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
-              /> */}
-              
-              <Grid container>
-                {/*add functionality of forget password*/}
-                <Grid item>
-                  {/* <Link href="#" variant="body1">
-                    {"Don't have an account? Sign Up"}
-                  </Link> */}
-                  {formState===0?<><Button variant="text" onClick={()=>setFormState(1)}>{"Don't have an account? Sign Up"}</Button></>:<></>}
+                        <div>
+                            <Button variant={formState === 0 ? "contained" : ""} onClick={() => { setFormState(0) }}>
+                                Sign In
+                            </Button>
+                            <Button variant={formState === 1 ? "contained" : ""} onClick={() => { setFormState(1) }}>
+                                Sign Up
+                            </Button>
+                        </div>
+
+                        <Box component="form" noValidate sx={{ mt: 1 }}>
+                            {formState === 1 ? <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="name" // Best practice: changed id from username to name to avoid duplicate IDs
+                                label="Full Name"
+                                name="name" // Best practice: changed name attr to match content
+                                value={name}
+                                autoFocus
+                                onChange={(e) => setName(e.target.value)}
+                            /> : <></>}
+
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="username"
+                                label="Username"
+                                name="username"
+                                // value={username}
+                                autoComplete="username"
+                                // removed autoFocus here to prevent conflict if "Full Name" also has it
+                                onChange={(e) => setUsername(e.target.value)}
+                            />
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                name="password"
+                                label="Password"
+                                value={password}
+                                type="password"
+                                onChange={(e) => setPassword(e.target.value)}
+                                id="password"
+                            />
+
+                            <p style={{ color: "red" }}>{error}</p>
+
+                            <Button
+                                type="button"
+                                fullWidth
+                                variant="contained"
+                                sx={{ mt: 3, mb: 2 }}
+                                onClick={handleAuth}
+                            >
+                                {formState === 0 ? "Login " : "Register"}
+                            </Button>
+
+                        </Box>
+                    </Box>
                 </Grid>
-              </Grid>
-            </Box>
-          </Box>
-        </Grid>
-      </Grid>
-      <Snackbar open={open} autoHideDuration={4000} message={message} />
-    </ThemeProvider>
-  );
+            </Grid>
+
+            <Snackbar
+                open={open}
+                autoHideDuration={4000}
+                message={message}
+            />
+
+        </ThemeProvider>
+    );
 }

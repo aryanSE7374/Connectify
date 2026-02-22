@@ -1,4 +1,4 @@
-import {Server} from "socket.io";
+import { Server } from "socket.io";
 
 let connections = {}
 let messages = {}
@@ -31,10 +31,16 @@ app.listen(3000, (token) => {
 
 */
 
-export const connectToSocket = (server)=>{
+export const connectToSocket = (server) => {
 
-    const io = new Server(server);
-    // pass cors with io Server
+    // pass cors with io Server - fixed!
+    const io = new Server(server, {
+        cors: { origin: "*", 
+            methods: ["GET", "POST"], 
+            allowedHeaders: ["*"], 
+            credentials: true 
+        }
+    });
 
     io.on("connection", (socket) => {
 
@@ -45,7 +51,7 @@ export const connectToSocket = (server)=>{
             if (connections[path] === undefined) {
                 connections[path] = []
             }
-            
+
             connections[path].push(socket.id)
 
             timeOnline[socket.id] = new Date();

@@ -1,10 +1,10 @@
-import logo from "./logo.svg";
 import "./App.css";
-import LandingPage from "./pages/landing";
+import Landing from "./pages/Landing";
+// import Authenticationv2 from "./pages/authentication2";
 import Authentication from "./pages/authentication";
-import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
-import VideoMeet from "./pages/VideoMeet";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import HomeComponent from './pages/home';
 
 function App() {
   return (
@@ -12,13 +12,14 @@ function App() {
       <Router>
         <AuthProvider>
           <Routes>
-            <Route path="/" element={<LandingPage />} />
+            < Route path="/" element={<Landing/>} />
             <Route path="/auth" element={<Authentication />} />
-            <Route path="/:url" element={<VideoMeet />}/>
+            < Route path="/home" element={<HomeComponent/>} />
           </Routes>
         </AuthProvider>
-      </Router>
+        </Router>
     </div>
+      
   );
 }
 

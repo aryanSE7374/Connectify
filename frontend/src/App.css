@@ -1,12 +1,14 @@
 *{
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 .landingPageContainer{
   
   height: 100vh;
-  background:url("/public/background.png");
+  width: 100vw;
+  background:url("/public/BG.png");
   background-repeat: no-repeat;
   background-size: cover;
   color: white ;
@@ -18,16 +20,35 @@
   display:flex;
   justify-content:space-between;
   align-items: center;
-}
+  /* Glass effect */
+  background: rgba(255, 255, 255, 0.08);
+  /* background: linear-gradient(135deg,rgba(255,255,255,0.15),rgba(255,255,255,0.05)); */
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%); 
 
+  border-radius: 18px;
+
+  border: 1px solid rgba(255,255,255,0.25);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+
+  /* margin: 1rem; */
+  /* background: rgba(255, 255, 255, 0.1); */
+  /* backdrop-filter: blur(10px); */
+  /* background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  margin: 1rem; */
+}
+  
 .landingPageContainer nav h2 {
   font-size: 1.8rem;
-  font-weight: 500;
+  font-weight: 700;
+  cursor: pointer;
 }
 
-.landingPageContainer nav .navlist {
+.landingPageContainer nav .navList {
   display: flex;
   gap: 1.8rem;
+  cursor: pointer;
 }
 
 .landingMainContainer {
@@ -35,7 +56,10 @@
   justify-content: space-between;
   padding-inline: 3rem;
   height: 80vh;
-  align-items: center;
+  align-items: center; 
+  /* margin-top: 110px */
+  /* 
+  */
 }
 
 .landingMainContainer>div:nth-child(1) {
@@ -43,14 +67,16 @@
 }
 
 .landingMainContainer>div:nth-child(1) div[role='button'] {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background: #D97500;
   width: fit-content;
   padding: 1rem;
   border-radius: 20px;
-  margin-top: 1.9rem;
+  margin-top: 1.9rem; 
+  /* 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  */
 }
 
 .landingMainContainer>div:nth-child(1) div[role='button'] a {
@@ -59,7 +85,19 @@
   font-size: 1.7rem;
 }
 
-.landingMainContainer>div:nth-child(2) img {
-  height: 70vh;
+/* .landingMainContainer>div:nth-child(2) img { */
+.landingMainContainer img {
+  height: 60vh;
   width: auto;
 }
+
+/* #mobile2img {
+  height: 70vh;
+  width: auto;
+  width: 25vw;
+  height: auto;        keeps aspect ratio
+  max-height: 40vh;   caps the height
+  max-width: 100%;     prevents overflow on small screens
+  visibility: hidden;
+} 
+*/
