@@ -1,10 +1,13 @@
 import "./App.css";
 import Landing from "./pages/LandingPage";
-// import Authenticationv2 from "./pages/authentication2";
-import Authentication from "./pages/authentication";
+// import Authentication from "./pages/authentication"; // classic MUI
+// import Authentication2 from "./pages/authentication2"; // classic MUI 2
+// import Authentication3 from "./pages/authentication3"; // glass theme 1
+import Authentication4 from "./pages/authentication4"; // glass theme 2
 import { AuthProvider } from "./contexts/AuthContext";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import HomeComponent from './pages/home';
+import VideoMeetComponent from "./pages/VideoMeet";
 
 function App() {
   return (
@@ -12,9 +15,10 @@ function App() {
       <Router>
         <AuthProvider>
           <Routes>
-            < Route path="/" element={<Landing/>} />
-            <Route path="/auth" element={<Authentication />} />
-            < Route path="/home" element={<HomeComponent/>} />
+            <Route path="/" element={<Landing/>} />
+            <Route path="/auth" element={<Authentication4 />} />
+            <Route path="/home" element={<HomeComponent/>} />
+            <Route path="/:url" element={<VideoMeetComponent/>} />
           </Routes>
         </AuthProvider>
         </Router>
