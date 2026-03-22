@@ -8,6 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import HomeComponent from './pages/home';
 import VideoMeetComponent from "./pages/VideoMeet";
+import VideoMeetComponent2 from "./pages/videoMeet2";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             <Route path="/" element={<Landing/>} />
             <Route path="/auth" element={<Authentication4 />} />
             <Route path="/home" element={<HomeComponent/>} />
+            <Route path="/meet2/:url" element={<VideoMeetComponent2/>} />
             <Route path="/:url" element={<VideoMeetComponent/>} />
           </Routes>
         </AuthProvider>

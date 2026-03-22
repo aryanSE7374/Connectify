@@ -34,7 +34,7 @@ app.use( "/api/v1/users" , userRoutes );
 // app.use( "/api/v2/users" , userRoutes ); // used to support older versions as well
 
 app.get("/" , (req,res)=>{
-    return res.json({"hello" : "world"});
+    return res.json({"backend" : "connectifyAPI"});
 })
 
 
