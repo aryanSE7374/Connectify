@@ -3,12 +3,14 @@ import Landing from "./pages/LandingPage";
 // import Authentication from "./pages/authentication"; // classic MUI
 // import Authentication2 from "./pages/authentication2"; // classic MUI 2
 // import Authentication3 from "./pages/authentication3"; // glass theme 1
-import Authentication4 from "./pages/authentication4"; // glass theme 2
+import Authentication4 from "./pages/AuthenticationPage"; // glass theme 2
 import { AuthProvider } from "./contexts/AuthContext";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import HomeComponent from './pages/home';
-import VideoMeetComponent from "./pages/VideoMeet";
-import VideoMeetComponent2 from "./pages/videoMeet2";
+import HomeComponent from './pages/Home';
+import VideoMeetComponent from "./pages/VideoMeet1";
+import VideoMeetComponent2 from "./pages/VideoMeet2";
+// import VideoMeetComponent from './pages/VideoMeet'
+import History from "./pages/history";
 
 function App() {
   return (
@@ -19,8 +21,8 @@ function App() {
             <Route path="/" element={<Landing/>} />
             <Route path="/auth" element={<Authentication4 />} />
             <Route path="/home" element={<HomeComponent/>} />
-            <Route path="/meet2/:url" element={<VideoMeetComponent2/>} />
-            <Route path="/:url" element={<VideoMeetComponent/>} />
+            <Route path="/history" element={<History/>} />
+            <Route path="/:url" element={<VideoMeetComponent2/>} />
           </Routes>
         </AuthProvider>
         </Router>

@@ -35,8 +35,7 @@ Value = connection to that specific user
 // ---------------------------------------------------------------------------------------------------------------------------------------- //
 // ---------------------------------------------------------------------------------------------------------------------------------------- //
 
-export default function VideoMeetComponent2() {
-    console.log("[VideoMeet2] Component render start");
+export default function VideoMeetComponent() {
 
     // ---------------------------------------------------------------------------------------------------------------------------------------- //
     // Refs and UI states
@@ -97,34 +96,28 @@ export default function VideoMeetComponent2() {
     // ISSUE1 : Double permission request inefficient
     // ISSUE2 : Using state immediately after setting it is unsafe
     const getPermissions = async ()=>{
-        console.log("[VideoMeet2] getPermissions called");
 
         // FIX 1 
         // tryna fix the issues - there's still some issues (LATER)
         try {
-        console.log("[VideoMeet2] Requesting camera and microphone permissions");
         // Request both camera & mic in one call
             // navigator.mediaDevices is the browser API for camera/mic/screen
             const stream = await navigator.mediaDevices.getUserMedia({
                 video: true,
                 audio: true
             });
-            console.log("[VideoMeet2] Camera and microphone permissions granted", stream);
 
             // If we reach here, permission granted
             // NOTE : it assumes that both the permissions are given and, 
             // hence if the mic permission is not given, the camera preview is not visible
             setVideoAvailable(true);
             setAudioAvailable(true);
-            console.log("[VideoMeet2] Updated availability state", { videoAvailable: true, audioAvailable: true });
 
             // Attach preview
             window.localStream = stream;
-            console.log("[VideoMeet2] window.localStream set from permission stream");
 
             if (localVideoref.current) { 
                 localVideoref.current.srcObject = stream;
-                console.log("[VideoMeet2] Local preview attached after permission grant");
             }
 
         } catch (err) {
@@ -133,29 +126,25 @@ export default function VideoMeetComponent2() {
             // If error, mark unavailable
             setVideoAvailable(false);
             setAudioAvailable(false);
-            console.log("[VideoMeet2] Updated availability state", { videoAvailable: false, audioAvailable: false });
         }
 
         // Screen share support check (no permission request here)
         if (navigator.mediaDevices.getDisplayMedia) {
             setScreenAvailable(true);
-            console.log("[VideoMeet2] Screen share is available");
         } else {
             setScreenAvailable(false);
-            console.log("[VideoMeet2] Screen share is not available");
         }
     };
 
     // get permissions use effect
     useEffect( ()=>{
-        console.log("[VideoMeet2] Initial useEffect fired -> getPermissions");
         getPermissions();
     }, []); // run only once
 
     // ---------------------------------------------------------------------------------------------------------------------------------------- //
 
     let getUserMediaSuccess = (stream) => {
-        console.log("[VideoMeet2] getUserMediaSuccess called", stream);
+
     };
 
     // ---------------------------------------------------------------------------------------------------------------------------------------- //
@@ -183,7 +172,7 @@ export default function VideoMeetComponent2() {
             - just muting video
             - No renogotiation
             - instant toggle
-            - connection stays intactf
+            - connection stays intact
 
         
         outcome : This keeps the RTCPeerConnection stable and avoids unnecessary SDP renegotiation.
@@ -193,66 +182,41 @@ export default function VideoMeetComponent2() {
 
     // video toggle handler
     let handleVideo = () => {
-        console.log("[VideoMeet2] handleVideo called", { hasLocalStream: !!window.localStream });
-        if (!window.localStream) {
-            console.log("[VideoMeet2] handleVideo aborted because localStream is missing");
-            return;
-        }
+        if (!window.localStream) return;
 
         window.localStream.getVideoTracks().forEach(track => {
-            console.log("[VideoMeet2] Toggling video track", { before: track.enabled });
             track.enabled = !track.enabled;
-            console.log("[VideoMeet2] Video track toggled", { after: track.enabled });
         });
 
-        setVideo(prev => {
-            const next = !prev;
-            console.log("[VideoMeet2] Updating video state", { prev, next });
-            return next;
-        });
+        setVideo(prev => !prev);
     };
 
     // audio toggle handler
     let handleAudio = () => {
-        console.log("[VideoMeet2] handleAudio called", { hasLocalStream: !!window.localStream });
-        if (!window.localStream) {
-            console.log("[VideoMeet2] handleAudio aborted because localStream is missing");
-            return;
-        }
+        if (!window.localStream) return;
 
         window.localStream.getAudioTracks().forEach(track => {
-            console.log("[VideoMeet2] Toggling audio track", { before: track.enabled });
             track.enabled = !track.enabled;
-            console.log("[VideoMeet2] Audio track toggled", { after: track.enabled });
         });
 
-        setAudio(prev => {
-            const next = !prev;
-            console.log("[VideoMeet2] Updating audio state", { prev, next });
-            return next;
-        });
+        setAudio(prev => !prev);
     };
 
     // resotre camera
     const restoreCamera = async () => {
-        console.log("[VideoMeet2] restoreCamera called");
         const camStream = await navigator.mediaDevices.getUserMedia({ video: true });
         const camTrack = camStream.getVideoTracks()[0];
-        console.log("[VideoMeet2] Camera stream reacquired", { camTrack });
 
         // keep old audio
         const audioTrack = window.localStream?.getAudioTracks()[0];
-        console.log("[VideoMeet2] Existing audio track during restore", { hasAudioTrack: !!audioTrack });
 
         for (let peerId in connections) {
-            console.log("[VideoMeet2] Replacing video track for peer during restore", { peerId });
             const sender = connections[peerId]
                 .getSenders()
                 .find(s => s.track?.kind === "video");
 
             if (sender) {
                 await sender.replaceTrack(camTrack);
-                console.log("[VideoMeet2] Camera track replaced for peer", { peerId });
             }
         }
         
@@ -264,11 +228,9 @@ export default function VideoMeetComponent2() {
         }
 
         window.localStream = newStream;
-        console.log("[VideoMeet2] window.localStream replaced with restored camera stream");
 
         if (localVideoref.current) {
             localVideoref.current.srcObject = newStream;
-            console.log("[VideoMeet2] Local preview updated after restoreCamera");
         }
 
     };
@@ -276,11 +238,6 @@ export default function VideoMeetComponent2() {
     // screen toggle handler
     // getDisplayMedia() : prompts the user to select and grant permission to capture the contents of a display as a MediaStream
     let handleScreenShare = async () => { // async because getDisplayMedia() returns promise
-        console.log("[VideoMeet2] handleScreenShare called", {
-            screen,
-            hasScreenTrackRef: !!screenTrackRef.current,
-            screenAvailable
-        });
         // CASE 1: Already sharing -> STOP manually
         // if (screenTrackRef.current) {
         //     console.log("Stopping screen share manually");
@@ -324,11 +281,9 @@ export default function VideoMeetComponent2() {
             console.log("Stopping screen share manually");
 
             const oldTrack = screenTrackRef.current;
-            console.log("[VideoMeet2] Existing screen track found, switching back to camera");
 
             setScreen(false);
             screenTrackRef.current = null; // INPORTANT to nullify the screenTrackRef
-            console.log("[VideoMeet2] Cleared screenTrackRef and updated screen state to false");
 
             // Replace FIRST (important)
             await restoreCamera();
@@ -359,27 +314,20 @@ export default function VideoMeetComponent2() {
         */
 
         try {
-            console.log("[VideoMeet2] Requesting display media");
             const screenStream = await navigator.mediaDevices.getDisplayMedia({
                 video: true
             });
-            console.log("[VideoMeet2] Display media granted", screenStream);
 
             const screenTrack = screenStream.getVideoTracks()[0]; // why 0 index? 
             // in screen, usually only one video Track is created and hence, it gets the first (and only) video track
 
             // get existing audio track
             const audioTrack = window.localStream?.getAudioTracks()[0];
-            console.log("[VideoMeet2] Preparing screen share stream", {
-                hasScreenTrack: !!screenTrack,
-                hasAudioTrack: !!audioTrack
-            });
 
             screenTrackRef.current = screenTrack; 
             // FIX: Store track → used for stopping later
 
             setScreen(true);
-            console.log("[VideoMeet2] Screen sharing state set to true");
 
             console.log("Screen track obtained");
 
@@ -387,7 +335,6 @@ export default function VideoMeetComponent2() {
             // Replace track in all peer connections
             for (let peerId in connections) {
                 const pc = connections[peerId];
-                console.log("[VideoMeet2] Replacing video sender with screen track", { peerId });
 
                 // pc.getSenders() : Returns list of RTCRtpSender (sender = object responsible for sending media)
 
@@ -396,7 +343,6 @@ export default function VideoMeetComponent2() {
                 if (sender) {
                     // await added to ensure stable switch, no race condition
                     await sender.replaceTrack(screenTrack); // Camera -> replaced by Screen
-                    console.log("[VideoMeet2] Screen track replaced for peer", { peerId });
                 }
             }
 
@@ -412,13 +358,11 @@ export default function VideoMeetComponent2() {
             }
 
             window.localStream = newStream;
-            console.log("[VideoMeet2] window.localStream replaced with screen stream");
 
 
             // Update local preview
             if (localVideoref.current) {
                 localVideoref.current.srcObject = newStream;
-                console.log("[VideoMeet2] Local preview updated for screen share");
             }
 
 
@@ -426,16 +370,11 @@ export default function VideoMeetComponent2() {
             // Handle when user stops sharing
             screenTrack.onended = async () => {
                 console.log("Screen sharing stopped");
-                console.log("[VideoMeet2] screenTrack.onended fired");
 
-                if ( !screenTrackRef.current ) {
-                    console.log("[VideoMeet2] screenTrack.onended ignored because ref is already cleared");
-                    return;
-                }
+                if ( !screenTrackRef.current ) return;
 
                 screenTrackRef.current = null;
                 setScreen(false);
-                console.log("[VideoMeet2] Screen share cleaned up after browser stop");
 
                 await restoreCamera(); 
                 // FIX: Reuse same logic → no duplication
@@ -467,24 +406,19 @@ export default function VideoMeetComponent2() {
 
     // call end hndler
     let handleEndCall = () => {
-        console.log("[VideoMeet2] handleEndCall called");
         try {
             if (window.localStream) {
-                console.log("[VideoMeet2] Stopping local tracks before ending call");
                 window.localStream.getTracks().forEach(track => track.stop());
             }
 
             for (let peerId in connections) {
-                console.log("[VideoMeet2] Closing peer connection", { peerId });
                 connections[peerId].close();
             }
 
         } catch (e) {
             console.log("error while ending the call");
-            console.log("[VideoMeet2] handleEndCall error", e);
         }
 
-        console.log("[VideoMeet2] Redirecting to home page after ending call");
         window.location.href = "/";
     };
 
@@ -521,10 +455,8 @@ export default function VideoMeetComponent2() {
     // NOTE : setVideo() and setAudio() are async , But connectToSocket called immediately
     // TO SCALE APP:    1.Acquire media, 2.Wait for success , 3.Then connect socket 
     let getMedia = () => {
-        console.log("[VideoMeet2] getMedia called", { videoAvailable, audioAvailable });
         setVideo(videoAvailable);
         setAudio(audioAvailable);
-        console.log("[VideoMeet2] Requested local toggle state sync from permissions");
         // minor refactor : wait for getUserMediaSuccess() before connecting socket.
         connectToSocketServer();
     };
@@ -557,9 +489,7 @@ export default function VideoMeetComponent2() {
     */
 
     let connect = () => {
-        console.log("[VideoMeet2] connect called", { username });
         setAskForUsername(false);
-        console.log("[VideoMeet2] askForUsername set to false");
         getMedia();
     };
 
@@ -567,20 +497,15 @@ export default function VideoMeetComponent2() {
 
     // WebRTC handshake : Offer -> Answer -> ICE exchange ?? 
     let gotMessageFromServer = async (fromId, message) => {
-        console.log("[VideoMeet2] gotMessageFromServer called", { fromId, message });
 
         //     console.log("Signal received from:", fromId);
         //     console.log("Message:", message);
 
         const signal = JSON.parse(message);
-        console.log("[VideoMeet2] Parsed signal from server", signal);
 
         const pc = connections[fromId];
 
-        if (!pc) {
-            console.log("[VideoMeet2] No peer connection found for signal sender", { fromId });
-            return;
-        }
+        if (!pc) return;
 
         // 1️⃣ Handle SDP
         if (signal.sdp) {
@@ -596,12 +521,10 @@ export default function VideoMeetComponent2() {
 
                 const answer = await pc.createAnswer();
                 await pc.setLocalDescription(answer);
-                console.log("[VideoMeet2] Answer created and local description set", { fromId });
 
                 socketRef.current.emit("signal", fromId, JSON.stringify({
                     sdp: pc.localDescription
                 }));
-                console.log("[VideoMeet2] Answer emitted to peer", { fromId });
             }
         }
 
@@ -619,12 +542,10 @@ export default function VideoMeetComponent2() {
 
 
     let connectToSocketServer = () => {
-        console.log("[VideoMeet2] connectToSocketServer called", { server_url });
         // socketRef.current = io.connect(server_url, { secure: false });
         // TO EXPLORE : check what happpens on cors removal in  backend socketManager controller
         // 1. Create persistent connection
         socketRef.current = io(server_url);
-        console.log("[VideoMeet2] socketRef.current initialized");
 
         // 2. Listen for successful connection
         socketRef.current.on("connect", () => {
@@ -636,7 +557,6 @@ export default function VideoMeetComponent2() {
 
             // 3. Join room
             socketRef.current.emit("join-call", window.location.href);
-            console.log("[VideoMeet2] join-call emitted", { room: window.location.href });
         });
 
         // 4. When someone joins
@@ -648,16 +568,10 @@ export default function VideoMeetComponent2() {
             clients.forEach((socketListId) => {
 
                 // Skip self
-                if (socketListId === socketIdRef.current) {
-                    console.log("[VideoMeet2] Skipping self socket in clients list", { socketListId });
-                    return;
-                }
+                if (socketListId === socketIdRef.current) return;
 
                 // Prevent duplicate connection creation
-                if (connections[socketListId]) {
-                    console.log("[VideoMeet2] Peer connection already exists, skipping", { socketListId });
-                    return;
-                }
+                if (connections[socketListId]) return;
 
                 console.log("Creating peer connection for:", socketListId);
 
@@ -665,16 +579,11 @@ export default function VideoMeetComponent2() {
 
                 // Store connection
                 connections[socketListId] = pc;
-                console.log("[VideoMeet2] Peer connection stored", {
-                    socketListId,
-                    totalConnections: Object.keys(connections).length
-                });
 
                 // ICE candidate handler - LEARN
                 pc.onicecandidate = (event) => {
                     if (event.candidate) {
                         console.log("Sending ICE candidate to:", socketListId);
-                        console.log("[VideoMeet2] ICE candidate payload", event.candidate);
 
                         socketRef.current.emit("signal", socketListId, JSON.stringify({
                             ice: event.candidate
@@ -695,36 +604,22 @@ export default function VideoMeetComponent2() {
                     // Why streams[0]? Because: WebRTC groups tracks into streams
                     const remoteStream = event.streams[0];
                     setVideos((prevVideos) => { // this is functional state update
-                        console.log("[VideoMeet2] setVideos called from remote track", {
-                            socketListId,
-                            prevCount: prevVideos.length
-                        });
                         // Check if already exists
                         const exists = prevVideos.find(v => v.socketId === socketListId);
 
                         if (exists) {
                             // Update existing
-                            const nextVideos = prevVideos.map(v =>
+                            return prevVideos.map(v =>
                                 v.socketId === socketListId
                                     ? { ...v, stream: remoteStream }
                                     : v
                             );
-                            console.log("[VideoMeet2] Updated existing remote video", {
-                                socketListId,
-                                nextCount: nextVideos.length
-                            });
-                            return nextVideos;
                         } else {
                             // Add new
-                            const nextVideos = [...prevVideos, {
+                            return [...prevVideos, {
                                 socketId: socketListId,
                                 stream: remoteStream
                             }];
-                            console.log("[VideoMeet2] Added new remote video", {
-                                socketListId,
-                                nextCount: nextVideos.length
-                            });
-                            return nextVideos;
                         }
                     });
                     // NOTE : why this, why not - setVideos([...videos, newVideo])
@@ -740,16 +635,8 @@ export default function VideoMeetComponent2() {
 
                 // Add local stream if available, without this your(user/client) video cant be sent to others
                 if (window.localStream) {
-                    console.log("[VideoMeet2] Adding local tracks to new peer connection", {
-                        socketListId,
-                        trackCount: window.localStream.getTracks().length
-                    });
                     window.localStream.getTracks().forEach(track => {
                         pc.addTrack(track, window.localStream);
-                        console.log("[VideoMeet2] Local track added to peer connection", {
-                            socketListId,
-                            kind: track.kind
-                        });
                     });
                 }
 
@@ -785,7 +672,6 @@ export default function VideoMeetComponent2() {
                     // Trickle ICE : send candidates as they discovered
                     pc.createOffer()
                         .then((offer) => {
-                            console.log("[VideoMeet2] Offer created", { peerId, offer });
                             return pc.setLocalDescription(offer);
                         })
                         .then(() => {
@@ -794,7 +680,6 @@ export default function VideoMeetComponent2() {
                             socketRef.current.emit("signal", peerId, JSON.stringify({
                                 sdp: pc.localDescription
                             }));
-                            console.log("[VideoMeet2] Offer emitted to peer", { peerId });
                         })
                         .catch((err) => console.error(err));
                 }
@@ -808,21 +693,14 @@ export default function VideoMeetComponent2() {
             console.log("User left:", id);
             // 5.1 : Close peer connection
             if (connections[id]) {
-                console.log("[VideoMeet2] Closing and deleting connection for user-left event", { id });
                 connections[id].close();
                 delete connections[id];
             }
 
             // 5.2 : Remove from UI
-            setVideos(prev => {
-                const nextVideos = prev.filter(video => video.socketId !== id);
-                console.log("[VideoMeet2] Removed remote video after user-left", {
-                    id,
-                    prevCount: prev.length,
-                    nextCount: nextVideos.length
-                });
-                return nextVideos;
-            });
+            setVideos(prev =>
+                prev.filter(video => video.socketId !== id)
+            );
         });
 
         // 6. Test signal event (we’ll implement later) - hasa been replaced by gotMessageFromServer callback
@@ -832,7 +710,6 @@ export default function VideoMeetComponent2() {
         // });
 
         socketRef.current.on("signal", gotMessageFromServer);
-        console.log("[VideoMeet2] Registered socket event listeners");
     }; 
 
     // ---------------------------------------------------------------------------------------------------------------------------------------- //
@@ -842,26 +719,12 @@ export default function VideoMeetComponent2() {
     return (
 
         <div>
-            {/* {console.log("[VideoMeet2] Rendering UI branch", {
-                askForUsername,
-                username,
-                videosCount: videos.length,
-                video,
-                audio,
-                screen,
-                videoAvailable,
-                audioAvailable,
-                screenAvailable
-            })} */}
             { 
                 askForUsername === true ? 
 
                 <div>
                     <h2>Enter into Lobby </h2>
-                    <TextField id="outlined-basic" label="Username" value={username} onChange={e => {
-                        console.log("[VideoMeet2] Username input changed", e.target.value);
-                        setUsername(e.target.value);
-                    }} variant="outlined" />
+                    <TextField id="outlined-basic" label="Username" value={username} onChange={e => setUsername(e.target.value)} variant="outlined" />
                     <Button variant="contained" onClick={connect} >Connect</Button>
 
                     <h3>Video Preview</h3>
@@ -875,10 +738,6 @@ export default function VideoMeetComponent2() {
                     <hr />
 
                     {videos.map((video) => (
-                        // console.log("[VideoMeet2] Rendering remote video element", {
-                        //     socketId: video.socketId,
-                        //     hasStream: !!video.stream
-                        // }),
                         <video
                             key={video.socketId}
                             autoPlay
@@ -886,7 +745,6 @@ export default function VideoMeetComponent2() {
                             ref={(ref) => {
                                 if (ref && video.stream) {
                                     ref.srcObject = video.stream;
-                                    console.log("[VideoMeet2] Remote video ref attached", { socketId: video.socketId });
                                 }
                             }}
                         />
@@ -949,3 +807,4 @@ ICE renegotiation happens only when
 - Changing codec / direction
 
 */
+
