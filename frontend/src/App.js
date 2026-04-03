@@ -6,9 +6,9 @@ import Landing from "./pages/LandingPage";
 import Authentication4 from "./pages/AuthenticationPage"; // glass theme 2
 import { AuthProvider } from "./contexts/AuthContext";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import HomeComponent from './pages/Home';
+import HomeComponent from './pages/home';
 import VideoMeetComponent from "./pages/VideoMeet1";
-import VideoMeetComponent2 from "./pages/VideoMeet2";
+import VideoMeetComponent2 from "./pages/videoMeet2";
 // import VideoMeetComponent from './pages/VideoMeet'
 import History from "./pages/history";
 
