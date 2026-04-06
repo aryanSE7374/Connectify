@@ -9,6 +9,7 @@ import MicOffIcon from '@mui/icons-material/MicOff'
 import ScreenShareIcon from '@mui/icons-material/ScreenShare';
 import StopScreenShareIcon from '@mui/icons-material/StopScreenShare'
 import CallEndIcon from '@mui/icons-material/CallEnd'
+import ChatIcon from '@mui/icons-material/Chat';
 import server from '../environment';
 
 const server_url = server;
@@ -35,7 +36,7 @@ Value = connection to that specific user
 // ---------------------------------------------------------------------------------------------------------------------------------------- //
 // ---------------------------------------------------------------------------------------------------------------------------------------- //
 
-export default function VideoMeetComponent2() {
+export default function VideoMeetComponent() {
     console.log("[VideoMeet2] Component render start");
 
     // ---------------------------------------------------------------------------------------------------------------------------------------- //
@@ -45,6 +46,7 @@ export default function VideoMeetComponent2() {
     const socketRef = useRef(); // external active socket connection (persistent)
     const socketIdRef = useRef(); // socket id assigned to user (persistent identity)
     const localVideoref = useRef(); // user's own video stream (DOM video element)
+    const showModalRef = useRef(true);
 
     // initial value changed to false
     // Does browser allow camera?
@@ -77,7 +79,7 @@ export default function VideoMeetComponent2() {
     // bug : initial state value = 3 , changed to 0
     let [newMessages, setNewMessages] = useState(0); // UI : new message alert (unread counter)
     
-    let [showModal, setModal] = useState(true); // UI component overlaying main content
+    let [showModal, setModal] = useState(false); // UI component overlaying main content
     
     let [askForUsername, setAskForUsername] = useState(true); // UI : guest login -> prompt the user for username
     
@@ -151,6 +153,11 @@ export default function VideoMeetComponent2() {
         console.log("[VideoMeet2] Initial useEffect fired -> getPermissions");
         getPermissions();
     }, []); // run only once
+
+    useEffect(() => {
+        showModalRef.current = showModal;
+        console.log("[VideoMeet2] showModalRef synced", { showModal });
+    }, [showModal]);
 
     // ---------------------------------------------------------------------------------------------------------------------------------------- //
 
@@ -485,7 +492,7 @@ export default function VideoMeetComponent2() {
         }
 
         console.log("[VideoMeet2] Redirecting to home page after ending call");
-        window.location.href = "/";
+        window.location.href = "/home";
     };
 
     // ---------------------------------------------------------------------------------------------------------------------------------------- //
@@ -582,7 +589,7 @@ export default function VideoMeetComponent2() {
             return;
         }
 
-        // 1️⃣ Handle SDP
+        // 1. Handle SDP
         if (signal.sdp) {
             console.log("SDP received from:", fromId);
 
@@ -605,7 +612,7 @@ export default function VideoMeetComponent2() {
             }
         }
 
-        // 2️⃣ Handle ICE
+        // 2. Handle ICE
         if (signal.ice) { // a possible route
             console.log("ICE received from:", fromId);
 
@@ -615,6 +622,35 @@ export default function VideoMeetComponent2() {
                 console.error("Error adding ICE:", e);
             }
         }
+    };
+
+    const sendMessage = () => {
+        const trimmedMessage = message.trim();
+        console.log("[VideoMeet2] sendMessage called", { trimmedMessage, username });
+
+        if (!trimmedMessage || !socketRef.current) {
+            console.log("[VideoMeet2] sendMessage aborted", {
+                hasMessage: !!trimmedMessage,
+                hasSocket: !!socketRef.current
+            });
+            return;
+        }
+
+        socketRef.current.emit("chat-message", trimmedMessage, username || "Guest");
+        setMessage("");
+    };
+
+    const toggleChatPanel = () => {
+        setModal(prev => {
+            const next = !prev;
+            console.log("[VideoMeet2] toggleChatPanel", { prev, next });
+
+            if (next) {
+                setNewMessages(0);
+            }
+
+            return next;
+        });
     };
 
 
@@ -832,6 +868,22 @@ export default function VideoMeetComponent2() {
         // });
 
         socketRef.current.on("signal", gotMessageFromServer);
+        socketRef.current.on("chat-message", (data, sender, socketIdSender) => {
+            console.log("[VideoMeet2] chat-message received", {
+                data,
+                sender,
+                socketIdSender
+            });
+
+            setMessages(prevMessages => ([
+                ...prevMessages,
+                { sender, data, socketIdSender }
+            ]));
+
+            if (!showModalRef.current && socketIdSender !== socketIdRef.current) {
+                setNewMessages(prevCount => prevCount + 1);
+            }
+        });
         console.log("[VideoMeet2] Registered socket event listeners");
     }; 
 
@@ -856,78 +908,150 @@ export default function VideoMeetComponent2() {
             { 
                 askForUsername === true ? 
 
-                <div>
-                    <h2>Enter into Lobby </h2>
-                    <TextField id="outlined-basic" label="Username" value={username} onChange={e => {
-                        console.log("[VideoMeet2] Username input changed", e.target.value);
-                        setUsername(e.target.value);
-                    }} variant="outlined" />
-                    <Button variant="contained" onClick={connect} >Connect</Button>
+                <div className={styles.lobbyShell}>
+                    <div className={styles.lobbyCard}>
+                        <div className={styles.pageChip}>Connectify Meet</div>
+                        <div className={styles.lobbyHeader}>
+                            <h2>Ready to join?</h2>
+                            <p>Use the same preview-and-join flow from the rest of Connectify before entering your room.</p>
+                        </div>
 
-                    <h3>Video Preview</h3>
-                    <div>
-                        <video ref={localVideoref} autoPlay muted></video>
+                        <div className={styles.lobbyControls}>
+                            <TextField
+                                id="outlined-basic"
+                                label="Username"
+                                value={username}
+                                onChange={e => {
+                                    console.log("[VideoMeet2] Username input changed", e.target.value);
+                                    setUsername(e.target.value);
+                                }}
+                                variant="outlined"
+                                className={styles.lobbyInput}
+                            />
+                            <Button variant="contained" onClick={connect} className={styles.connectButton}>Connect</Button>
+                        </div>
+
+                        <div className={styles.lobbyPreviewSection}>
+                            <h3>Video Preview</h3>
+                            <div className={styles.lobbyPreviewFrame}>
+                                <video
+                                    ref={localVideoref}
+                                    autoPlay
+                                    muted
+                                    playsInline
+                                    className={styles.lobbyPreviewVideo}
+                                ></video>
+                            </div>
+                        </div>
                     </div>
                 </div> : 
 
-                <div>
-                    <h1>Inside the Meet!!</h1>
-                    <hr />
+                <div className={styles.meetVideoContainer}>
+                    <div className={styles.meetTopBar}>
+                        <div className={styles.brandBlock}>
+                            <p className={styles.brandEyebrow}>Connectify</p>
+                            <h1>Meeting Room</h1>
+                        </div>
+                        <div className={styles.meetStatusCard}>
+                            <p className={styles.meetStatusLabel}>Status</p>
+                            <p className={styles.meetStatusValue}>{username ? `${username} is in the room` : "Live meeting room"}</p>
+                        </div>
+                    </div>
+                    <hr className={styles.meetDivider} />
 
-                    {videos.map((video) => (
-                        // console.log("[VideoMeet2] Rendering remote video element", {
-                        //     socketId: video.socketId,
-                        //     hasStream: !!video.stream
-                        // }),
-                        <video
-                            key={video.socketId}
-                            autoPlay
-                            playsInline
-                            ref={(ref) => {
-                                if (ref && video.stream) {
-                                    ref.srcObject = video.stream;
-                                    console.log("[VideoMeet2] Remote video ref attached", { socketId: video.socketId });
-                                }
-                            }}
-                        />
-                    ))}
+                    {showModal ? 
+                        <div className={styles.chatRoom}>
+                            <div className={styles.chatContainer}>
+                                <div className={styles.chatHeader}>
+                                    <h2>Chat</h2>
+                                    <Button variant="text" onClick={toggleChatPanel}>Close</Button>
+                                </div>
 
-                    <hr />
+                                <div className={styles.chattingDisplay}>
+                                    {messages.length !== 0 ? messages.map((item, index) => (
+                                        <div className={styles.chatMessage} key={`${item.socketIdSender || item.sender}-${index}`}>
+                                            <p className={styles.chatSender}>{item.sender}</p>
+                                            <p className={styles.chatText}>{item.data}</p>
+                                        </div>
+                                    )) : <p className={styles.emptyChatState}>No Messages Yet</p>}
+                                </div>
 
-                    <div>
-                        <IconButton onClick={handleVideo} style={{ color: "black" }}>
+                                <div className={styles.chattingArea}>
+                                    <TextField
+                                        value={message}
+                                        onChange={(e) => setMessage(e.target.value)}
+                                        id="outlined-basic"
+                                        label="Enter Your chat"
+                                        variant="outlined"
+                                        className={styles.chatInput}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                sendMessage();
+                                            }
+                                        }}
+                                    />
+                                    <Button variant='contained' onClick={sendMessage}>Send</Button>
+                                </div>
+                            </div>
+                        </div> : null}
+
+                    <div className={styles.conferenceView}>
+                        {videos.map((video) => (
+                            <div className={styles.remoteVideoCard} key={video.socketId}>
+                                <video
+                                    autoPlay
+                                    playsInline
+                                    ref={(ref) => {
+                                        if (ref && video.stream) {
+                                            ref.srcObject = video.stream;
+                                            console.log("[VideoMeet2] Remote video ref attached", { socketId: video.socketId });
+                                        }
+                                    }}
+                                />
+                            </div>
+                        ))}
+                    </div>
+
+                    <video
+                        className={styles.meetUserVideo}
+                        ref={(ref) => {
+                            localVideoref.current = ref;
+
+                            if (ref && window.localStream) {
+                                ref.srcObject = window.localStream;
+                            }
+                        }}
+                        autoPlay
+                        muted
+                        playsInline
+                    ></video>
+
+                    <div className={styles.buttonContainers}>
+                        <IconButton onClick={handleVideo} className={styles.controlButton}>
                             {video ? <VideocamIcon /> : <VideocamOffIcon />}
                         </IconButton>
 
-                        <IconButton onClick={handleAudio} style={{ color: "black" }}>
+                        <IconButton onClick={handleAudio} className={styles.controlButton}>
                             {audio ? <MicIcon /> : <MicOffIcon />}
                         </IconButton>
-                        {/* <IconButton onClick={handleScreenShare}>
-                            🖥️ Share Screen
-                        </IconButton> */}
+
                         {
                             screenAvailable === true ?
-                            <IconButton onClick={handleScreenShare} style={{ color: "black" }}>
-                                {/* {screen === true ? <ScreenShareIcon /> : <StopScreenShareIcon />} */}
+                            <IconButton onClick={handleScreenShare} className={styles.controlButton}>
                                 {screen === true ? <StopScreenShareIcon /> : <ScreenShareIcon />}
                             </IconButton> : <></>
                         }
-                        <IconButton onClick={handleEndCall} style={{ color: "red" }}>
+
+                        <Badge badgeContent={newMessages} max={999} color='warning'>
+                            <IconButton onClick={toggleChatPanel} className={styles.controlButton}>
+                                <ChatIcon />
+                            </IconButton>
+                        </Badge>
+
+                        <IconButton onClick={handleEndCall} className={styles.endCallButton}>
                             <CallEndIcon  />
                         </IconButton>
                     </div>
-
-                    {/* <div>
-                        <IconButton onClick={handleVideo}>
-                            {video ? "📹 ON" : "🚫 OFF"}
-                        </IconButton>
-
-                        <IconButton onClick={handleAudio}>
-                            {audio ? "🎤 ON" : "🔇 OFF"}
-                        </IconButton>
-                    </div> */}
-
-                    <hr />
                 </div>
             }
         </div>

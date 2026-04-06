@@ -4,6 +4,22 @@
   box-sizing: border-box;
 }
 
+:root {
+  --meet-primary: #667eea;
+  --meet-secondary: #764ba2;
+  --meet-bg-start: #f6f8fc;
+  --meet-bg-mid: #edf2fb;
+  --meet-bg-end: #e6edf9;
+  --meet-surface: rgba(255, 255, 255, 0.92);
+  --meet-surface-strong: rgba(255, 255, 255, 0.96);
+  --meet-border: rgba(148, 163, 184, 0.2);
+  --meet-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+  --meet-shadow-strong: 0 28px 60px rgba(15, 23, 42, 0.14);
+  --meet-text: #0f172a;
+  --meet-muted: #475569;
+  --meet-soft: #eef2ff;
+}
+
 .landingPageContainer{
   
   height: 100vh;
@@ -101,3 +117,318 @@
   visibility: hidden;
 } 
 */
+
+/* Navigation Bar Styles (Home Page) */
+.navBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #f5f5f5;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navBar h2 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #333;
+}
+
+.navBar p {
+  margin: 0 0.5rem;
+  color: #666;
+}
+
+.navBar div:last-child {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Meeting Container Styles (Home Page) */
+.meetContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3rem;
+  min-height: calc(100vh - 80px);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.leftPanel {
+  flex: 1;
+  padding-right: 2rem;
+}
+
+.leftPanel h2 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  line-height: 1.2;
+}
+
+.leftPanel > div > div {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.leftPanel input {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  color: #333 !important;
+}
+
+.leftPanel input::placeholder {
+  color: #999 !important;
+}
+
+.rightPanel {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.rightPanel img {
+  max-width: 100%;
+  height: auto;
+  max-height: 500px;
+}
+
+.appThemeShell {
+  min-height: 100vh;
+  padding: 28px;
+  background:
+    radial-gradient(circle at top left, rgba(102, 126, 234, 0.18), transparent 24%),
+    radial-gradient(circle at top right, rgba(102, 126, 234, 0.16), transparent 22%),
+    linear-gradient(160deg, var(--meet-bg-start) 0%, var(--meet-bg-mid) 48%, var(--meet-bg-end) 100%);
+}
+
+.appThemeTopBar {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.appThemeBrand,
+.appThemePanel,
+.historyCard {
+  border-radius: 24px;
+  border: 1px solid var(--meet-border);
+  background: var(--meet-surface);
+  box-shadow: var(--meet-shadow);
+  color: var(--meet-text);
+}
+
+.appThemeBrand {
+  flex: 1;
+  padding: 24px 28px;
+}
+
+.appThemeBrand p,
+.historyEmptyState p {
+  margin: 0 0 10px;
+  color: var(--meet-primary);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.appThemeBrand h1,
+.historySectionHeader h1 {
+  margin: 0;
+  color: var(--meet-text);
+}
+
+.appThemeActions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, var(--meet-primary) 0%, var(--meet-secondary) 100%);
+  color: white;
+  box-shadow: 0 20px 40px rgba(102, 126, 234, 0.22);
+}
+
+.appThemeActionItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.appThemeActionText {
+  margin: 0;
+  font-weight: 600;
+}
+
+.appThemeActionButton,
+.appThemeIconButton {
+  color: var(--meet-text) !important;
+  background: var(--meet-soft) !important;
+}
+
+.appThemeIconButton {
+  width: 48px;
+  height: 48px;
+}
+
+.appThemeGhostButton {
+  color: white !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+.appThemePanel {
+  padding: 32px;
+}
+
+.homeThemeGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  gap: 24px;
+  align-items: stretch;
+}
+
+.homeHeroCopy h2 {
+  margin: 0;
+  color: var(--meet-text);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 1.1;
+}
+
+.homeHeroCopy p {
+  margin: 14px 0 0;
+  color: var(--meet-muted);
+  font-size: 1.05rem;
+}
+
+.homeJoinRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.homeMeetingInput {
+  min-width: min(100%, 320px);
+  background: var(--meet-surface-strong);
+  border-radius: 14px;
+}
+
+.homeJoinButton {
+  min-height: 56px;
+  padding-inline: 24px;
+  border-radius: 14px !important;
+  text-transform: none !important;
+  font-weight: 700 !important;
+}
+
+.homeVisualPanel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 360px;
+  background:
+    linear-gradient(180deg, rgba(102, 126, 234, 0.12), rgba(255, 255, 255, 0.7)),
+    #dbe6ff;
+}
+
+.homeVisualPanel img {
+  width: min(100%, 360px);
+  height: auto;
+}
+
+.historyThemeLayout {
+  display: grid;
+  gap: 24px;
+}
+
+.historySectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.historySectionHeader p {
+  margin: 10px 0 0;
+  color: var(--meet-muted);
+}
+
+.historyIntro {
+  margin: 10px 0 0;
+  color: var(--meet-muted);
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.historyGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.historyCard {
+  padding: 8px;
+}
+
+.historyEmptyState {
+  padding: 32px;
+  border-radius: 24px;
+  border: 1px solid var(--meet-border);
+  background: var(--meet-surface);
+  box-shadow: var(--meet-shadow);
+}
+
+.historyEmptyState h2 {
+  margin: 0;
+  color: var(--meet-text);
+}
+
+.historyEmptyState span {
+  color: var(--meet-muted);
+}
+
+@media (max-width: 900px) {
+  .appThemeShell {
+    padding: 20px 16px;
+  }
+
+  .appThemeTopBar,
+  .historySectionHeader {
+    flex-direction: column;
+  }
+
+  .homeThemeGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .appThemeActions {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .appThemeBrand,
+  .appThemePanel,
+  .historyEmptyState {
+    padding: 24px;
+  }
+
+  .homeJoinRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .homeJoinButton {
+    width: 100%;
+  }
+}

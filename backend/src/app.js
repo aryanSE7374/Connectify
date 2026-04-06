@@ -51,8 +51,8 @@ const start = async ()=>{
     }
     
 
-    server.listen( PORT , ()=>{
-        console.log(`app is listening on PORT : ${PORT}`);
+    server.listen(app.get("port"), ()=>{
+        console.log(`app is listening on PORT : ${app.get("port")}`);
     });
 
 
